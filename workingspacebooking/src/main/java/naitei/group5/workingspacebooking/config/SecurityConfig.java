@@ -8,12 +8,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import static naitei.group5.workingspacebooking.constant.Endpoint.*;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity 
 public class SecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,11 +35,12 @@ public class SecurityConfig {
                             AUTH_LOGOUT, 
                             AUTH_REGISTER_RENTER, 
                             AUTH_REGISTER_OWNER,
-                            AUTH_REGISTER,
                             OWNER_VENUES
                         ).permitAll()
+                        .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB).hasRole("renter") // renter bắt buộc login
                         .anyRequest().authenticated()
-                );
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

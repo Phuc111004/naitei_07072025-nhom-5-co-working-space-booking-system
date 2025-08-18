@@ -14,7 +14,6 @@ import java.util.Optional;
 @Repository
 public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpecificationExecutor<Venue> {
 
-    // Tìm venue theo id, load kèm owner + venueStyle (tránh N+1)
     @Query("""
             SELECT v 
             FROM Venue v 
@@ -24,7 +23,8 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
             """)
     Optional<Venue> findByIdWithDetails(@Param("id") Integer id);
 
-    // Tìm tất cả venue của 1 owner, load kèm venueStyle
     @EntityGraph(attributePaths = {"venueStyle"})
     List<Venue> findByOwnerId(Integer ownerId);
+
+    List<Venue> findByVerified(Boolean verified);
 }
